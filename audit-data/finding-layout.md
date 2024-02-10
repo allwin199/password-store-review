@@ -51,3 +51,51 @@ myPassword
 ```
 
 **Recommended Mitigation:** Considering this, it's crucial to reconsider the contract's overall architecture. One potential approach is to encrypt the password off-chain and subsequently store the encrypted version on-chain. Users would then need to remember an additional off-chain password to decrypt it. However, it's advisable to eliminate the view function to prevent users from inadvertently transmitting a transaction with the password used for decryption.
+
+---
+
+### [S-#] `PasswordStore::setPassword` has no access controls, meaning a non-owner could change the password.
+
+**Description:** The `PasswordStore::setPassword` function is set to be an `external` function, however, the natspec of the function and overall purpose of the smart contract is that `This function allows only the owner to set a new password.`
+
+```js
+    function setPassword(string memory newPassword) external {
+@>      // @audit There are no access controls
+        s_password = newPassword;
+        emit SetNetPassword();
+    }
+```
+
+**Impact:** Anyone can set/change the password of the contract, severly breaking the contract intended functionality.
+
+**Proof of Concept:** Add the following to the `PasswordStore.t.sol` test file
+
+<details>
+<summary>Code</summary>
+
+```js
+    function test_Fuzz_Anyone_Can_Set_Password(address randomAddress) public {
+        vm.assume(randomAddress != owner);
+
+        string memory newPassword = "newPassword";
+        vm.startPrank(randomAddress);
+        passwordStore.setPassword(newPassword);
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        string memory currentPassword = passwordStore.getPassword();
+        vm.stopPrank();
+
+        assertEq(currentPassword, newPassword);
+    }
+```
+
+</details>
+
+**Recommended Mitigation:** Add an access control conditional to the `setPassword` function.
+
+```js
+    if(msg.sender != s_owner){
+        revert PasswordStore__NotOwner();
+    }
+```
