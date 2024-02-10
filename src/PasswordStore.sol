@@ -11,7 +11,7 @@ contract PasswordStore {
     error PasswordStore__NotOwner();
 
     address private s_owner;
-    // @audit the s_password variable is not actually private! This is not a safe place to secure your password.
+    // @audit the s_password variable is not actually private! This is not a safe place to secure your password!
     string private s_password;
 
     event SetNetPassword();
