@@ -6,11 +6,11 @@ contract Dos {
 
     address[] entrants;
 
-    function enter() public {
+    function enter() external {
         //check for duplicate entrants
         address[] memory cachedEntrants = entrants;
         for (uint256 i; i < cachedEntrants.length; i++) {
-            if (entrants[i] == msg.sender) {
+            if (cachedEntrants[i] == msg.sender) {
                 revert Dos__Player_AlreadyExists();
             }
         }
@@ -33,7 +33,7 @@ contract Dos {
 // ---------
 
 // If the players ented is 1000
-// when 1001th player has to enter loop has to run 1000 times.
+// when 1001th player has to enter, loop has to run 1000 times.
 // Since `enter` will become more gas intensive. This contract will become unusable
 
 // Denying the service of the contract.(DOS)
@@ -42,30 +42,21 @@ contract Dos {
 
 // Let's benchmark some results
 
-// 0 Players -> Execution Cost : 44851
+// 1 Player -> Execution Cost : 55010
 
-// For 0 players Execution cost is more than 1 player because,
+// For 1 player Execution cost is more than 2 players because,
 // since we are calling entrants[] for the first time. we have to warmup the storage variable.
 // more explanation below
 
-// 1 -> 30537
+// 2 -> 26804
 
-// 2 -> 33254
+// 3 -> 27,436
 
-// 3 -> 35971
-
-// 4 -> 38688
-
-// 5 -> 41405
-
-// 6 -> 44122
-
-// 100 -> ?
-
-// 1000 -> ?
+// 1001 -> 662,053
 
 // If we look at the pattern, the gas gets increasing for every player.
 // As said for 1000 players this protocol will become more gas intensive and denying interation with the protocol.
+// 1001 player has to pay 662,053 in gas
 
 // ----------
 
