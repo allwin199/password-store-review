@@ -10,9 +10,8 @@ seed = '0x2'
 # If seed is not set, random numbers will not be in order and code will break for different resons. 
 
 [invariant]
-runs = 64
-depth = 32
-fail_on_revert = false
+runs = 1000
+fail_on_revert = true
 
 remappings = ['@openzeppelin/contracts=lib/openzeppelin-contracts/contracts']
 
