@@ -9,4 +9,9 @@ seed = '0x2'
 # By setting the seed, for this seed every time same random number will be applied in order.
 # If seed is not set, random numbers will not be in order and code will break for different resons. 
 
+[invariant]
+runs = 64
+depth = 32
+fail_on_revert = false
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
