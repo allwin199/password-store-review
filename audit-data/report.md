@@ -43,12 +43,11 @@ Lead Security Researches:
 - [Findings](#findings)
   - [High](#high)
     - [\[H-1\] Storing the password on-chain make it is visible to anyone. and no longer private.](#h-1-storing-the-password-on-chain-make-it-is-visible-to-anyone-and-no-longer-private)
-      - [Likelihood \& Impact:](#likelihood--impact)
     - [\[H-2\] `PasswordStore::setPassword` has no access controls, meaning a non-owner could change the password.](#h-2-passwordstoresetpassword-has-no-access-controls-meaning-a-non-owner-could-change-the-password)
-      - [Likelihood \& Impact:](#likelihood--impact-1)
+      - [Likelihood \& Impact:](#likelihood--impact)
   - [Informational](#informational)
     - [\[I-1\] The `PasswordStore::getPassword` natspec indicates a parameter that dosen't exist, causing the natspec to be incorrect.](#i-1-the-passwordstoregetpassword-natspec-indicates-a-parameter-that-dosent-exist-causing-the-natspec-to-be-incorrect)
-      - [Likelihood \& Impact:](#likelihood--impact-2)
+      - [Likelihood \& Impact:](#likelihood--impact-1)
 
 # Protocol Summary
 
@@ -158,11 +157,6 @@ myPassword
 
 **Recommended Mitigation:** Considering this, it's crucial to reconsider the contract's overall architecture. One potential approach is to encrypt the password off-chain and subsequently store the encrypted version on-chain. Users would then need to remember an additional off-chain password to decrypt it. However, it's advisable to eliminate the view function to prevent users from inadvertently transmitting a transaction with the password used for decryption.
 
-#### Likelihood & Impact:
-
--   Impact : HIGH
--   Likelihood: HIGH
--   Severity: HIGH
 
 ---
 

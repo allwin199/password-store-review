@@ -12,6 +12,8 @@
             [Audit Readiness Checklist](https://github.com/nascentxyz/simple-security-toolkit/blob/main/audit-readiness-checklist.md)
         
     2. Reconnaissance
+        - [ ]  Read the Docs
+        - [ ]  Understand the code base in high level
         - [ ]  Run Test Coverage
   
     3. Vulnerability identification

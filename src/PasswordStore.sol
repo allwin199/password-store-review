@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.18; // q is this the latest compiler version?
 
 /*
  * @author not-so-secure-dev
@@ -11,6 +11,8 @@ contract PasswordStore {
     error PasswordStore__NotOwner();
 
     address private s_owner;
+    // @audit-medium anything stored in the blockchain is public and it is visible to everyone.
+    // This exploit is known as public data
     string private s_password;
 
     event SetNetPassword();
@@ -24,6 +26,8 @@ contract PasswordStore {
      * @param newPassword The new password to set.
      */
     function setPassword(string memory newPassword) external {
+        // @audit-medium missing onlyOwner Modifier
+        // This exploit is known as missing access control
         s_password = newPassword;
         emit SetNetPassword();
     }
@@ -32,6 +36,8 @@ contract PasswordStore {
      * @notice This allows only the owner to retrieve the password.
      * @param newPassword The new password to set.
      */
+    // @audit-info `newPassword` is missing
+    // @param newPassword The new password to set. line should be removed
     function getPassword() external view returns (string memory) {
         if (msg.sender != s_owner) {
             revert PasswordStore__NotOwner();
