@@ -1,34 +1,42 @@
----
-title: Protocol Audit Report
-author: Prince Allwin
-date: February 10, 2024
-header-includes:
-  - \usepackage{titling}
-  - \usepackage{graphicx}
----
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    .full-page {
+        width:  100%;
+        height:  100vh; /* This will make the div take up the full viewport height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .full-page img {
+        max-width:  200;
+        max-height:  200;
+        margin-bottom: 5rem;
+    }
+    .full-page div{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+</head>
+<body>
 
-\begin{titlepage}
-    \centering
-    \begin{figure}[h]
-        \centering
-    \end{figure}
-    \vspace*{2cm}
-    {\Huge\bfseries Protocol Audit Report\par}
-    \vspace{1cm}
-    {\Large Version 1.0\par}
-    \vspace{2cm}
-    {\Large\itshape Prince Allwin\par}
-    \vfill
-    {\large \today\par}
-\end{titlepage}
+<div class="full-page">
+    <img src="./logo.svg" alt="Logo">
+    <div>
+    <h1>Password Store Protocol Audit Report</h1>
+    <h3>Prepared by: Prince Allwin</h3>
+    </div>
+</div>
 
-\maketitle
+</body>
+</html>
 
 <!-- Your report starts here! -->
-
-Prepared by: [Prince Allwin]()
-Lead Security Researches: 
-- Prince Allwin
 
 # Table of Contents
 - [Table of Contents](#table-of-contents)
@@ -36,22 +44,20 @@ Lead Security Researches:
 - [Disclaimer](#disclaimer)
 - [Risk Classification](#risk-classification)
 - [Audit Details](#audit-details)
-  - [Scope](#scope)
-  - [Roles](#roles)
+	- [Scope](#scope)
+	- [Roles](#roles)
 - [Executive Summary](#executive-summary)
-  - [Issues found](#issues-found)
+	- [Issues found](#issues-found)
 - [Findings](#findings)
-  - [High](#high)
-    - [\[H-1\] Storing the password on-chain make it is visible to anyone. and no longer private.](#h-1-storing-the-password-on-chain-make-it-is-visible-to-anyone-and-no-longer-private)
-    - [\[H-2\] `PasswordStore::setPassword` has no access controls, meaning a non-owner could change the password.](#h-2-passwordstoresetpassword-has-no-access-controls-meaning-a-non-owner-could-change-the-password)
-      - [Likelihood \& Impact:](#likelihood--impact)
-  - [Informational](#informational)
-    - [\[I-1\] The `PasswordStore::getPassword` natspec indicates a parameter that dosen't exist, causing the natspec to be incorrect.](#i-1-the-passwordstoregetpassword-natspec-indicates-a-parameter-that-dosent-exist-causing-the-natspec-to-be-incorrect)
-      - [Likelihood \& Impact:](#likelihood--impact-1)
+	- [High](#high)
+		- [\[H-1\] Storing the password on-chain make it is visible to anyone, and no longer private.](#h-1-storing-the-password-on-chain-make-it-is-visible-to-anyone-and-no-longer-private)
+		- [\[H-2\] `PasswordStore::setPassword` has no access controls, meaning a non-owner could change the password.](#h-2-passwordstoresetpassword-has-no-access-controls-meaning-a-non-owner-could-change-the-password)
+	- [Informational](#informational)
+		- [\[I-1\] The `PasswordStore::getPassword` natspec indicates a parameter that dosen't exist, causing the natspec to be incorrect.](#i-1-the-passwordstoregetpassword-natspec-indicates-a-parameter-that-dosent-exist-causing-the-natspec-to-be-incorrect)
 
 # Protocol Summary
 
-A smart contract applicatin for storing a password. Users should be able to store a password and then retrieve it later. Others should not be able to access the password. 
+A smart contract application for storing a password. Users should be able to store a password and then retrieve it later. Others should not be able to access the password. 
 
 # Disclaimer
 
@@ -103,7 +109,7 @@ Commit Hash:
 
 ## High
 
-### [H-1] Storing the password on-chain make it is visible to anyone. and no longer private.
+### [H-1] Storing the password on-chain make it is visible to anyone, and no longer private.
 
 **Description:** All data stored on-chain is visible to anyone, and can be read directly from the blockchain. The `PasswordStore::s_password` variable is intended to be a private variable and only accessed through the `PasswordStore::getPassword` function, which is intended to be only called by the owner of the contract.
 
@@ -130,11 +136,11 @@ make deploy
 3. Run the storage tool
 
 ```bash
-cast storage <contract_name> <storage_slot>
+cast storage <contract_name> <storage_slot> <rpc_url>
 ```
 
 ```bash
-cast storage 0x5FbDB2315678afecb367f032d93F642f64180aa3 1
+cast storage 0x5FbDB2315678afecb367f032d93F642f64180aa3 1 --rpc-url http://127.0.0.1:8545
 ```
 
 We use `1` because that's the storage slot of `s_password` in the contract.
@@ -165,9 +171,8 @@ myPassword
 **Description:** The `PasswordStore::setPassword` function is set to be an `external` function, however, the natspec of the function and overall purpose of the smart contract is that `This function allows only the owner to set a new password.`
 
 ```js
-    function setPassword(string memory newPassword) external {
-@>      // @audit There are no access controls
-        s_password = newPassword;
+    function setPassword(string memory newPassword) external {   
+@>      s_password = newPassword;
         emit SetNetPassword();
     }
 ```
@@ -183,16 +188,16 @@ myPassword
     function test_Fuzz_Anyone_Can_Set_Password(address randomAddress) public {
         vm.assume(randomAddress != owner);
 
-        string memory newPassword = "newPassword";
+        string memory expectedPassword = "newPassword";
         vm.startPrank(randomAddress);
-        passwordStore.setPassword(newPassword);
+        passwordStore.setPassword(expectedPassword);
         vm.stopPrank();
 
         vm.startPrank(owner);
-        string memory currentPassword = passwordStore.getPassword();
+        string memory actualPassword = passwordStore.getPassword();
         vm.stopPrank();
 
-        assertEq(currentPassword, newPassword);
+        assertEq(actualPassword, expectedPassword);
     }
 ```
 
@@ -205,12 +210,6 @@ myPassword
         revert PasswordStore__NotOwner();
     }
 ```
-
-#### Likelihood & Impact:
-
--   Impact : HIGH
--   Likelihood: HIGH
--   Severity: HIGH
 
 ---
 
@@ -228,8 +227,3 @@ myPassword
 -    * @param newPassword The new password to set.
 ```
 
-#### Likelihood & Impact:
-
--   Impact : NONE
--   Likelihood: HIGH
--   Severity: Informational/Gas/Non-crits
