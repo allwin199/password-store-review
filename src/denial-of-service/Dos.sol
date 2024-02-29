@@ -20,7 +20,7 @@ contract Dos {
 }
 
 // In the above code we have a entrants[] which will contain addresses.
-// Before pusing an address we are checking wether that address already exists?
+// Before pusing an address we are checking whether that address already exists?
 // If already exists it will revert
 // If not new entrant will be added to entrants[]
 
@@ -32,7 +32,7 @@ contract Dos {
 
 // ---------
 
-// If the players ented is 1000
+// If the players entered is 1000
 // when 1001th player has to enter, loop has to run 1000 times.
 // Since `enter` will become more gas intensive. This contract will become unusable
 

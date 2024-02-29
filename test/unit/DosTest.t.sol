@@ -93,7 +93,7 @@ contract DosTest is Test {
         //     Warmup Gas Cost 55010
         //     Gas Cost A 26804
         //     Gas Cost B 27436
-        //     Gas Cost C 662053
+        //     Gas Cost C 662053 // this is 1001th player
     }
 
     // For 3 people to enter -> 27,436
